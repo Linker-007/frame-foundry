@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="在浏览器本地将多张图片整理、预览并导出为 GIF。"
+    />
+    <title>Frame Foundry · 多图转 GIF</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">
+          <!-- 层叠帧：两张叠放的画格，暗层在后，表达「多张图 → 一段动画」 -->
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="16" width="24" height="24" rx="4"
+              stroke="currentColor" stroke-width="3" opacity=".42" />
+            <rect x="18" y="8" width="24" height="24" rx="4" fill="currentColor" />
+          </svg>
+        </span>
+        <div>
+          <p class="eyebrow">LOCAL IMAGE SEQUENCER</p>
+          <h1>Frame Foundry</h1>
+        </div>
+      </div>
+      <p class="privacy-note">图片仅在本地处理</p>
+    </header>
+
+    <main class="workspace">
+      <section class="import-panel" aria-labelledby="import-title">
+        <div class="section-heading">
+          <p class="eyebrow">01 / IMPORT</p>
+          <h2 id="import-title">导入多张图片</h2>
+          <p>将 PNG、JPEG、WebP 或 GIF 图片拖入工作区，或从设备中选择。</p>
+        </div>
+
+        <div class="drop-zone" id="drop-zone" tabindex="0">
+          <span class="drop-zone__icon" aria-hidden="true">＋</span>
+          <p class="drop-zone__title">拖放图片到这里</p>
+          <p class="drop-zone__hint">支持多选，按文件选择顺序追加</p>
+            <button class="button button--primary" id="pick-button" type="button">
+              选择图片
+            </button>
+            <p class="drop-zone__formats" aria-hidden="true">
+              <span>PNG</span><span>JPEG</span><span>WEBP</span><span>GIF</span>
+            </p>
+            <input
+              id="file-input"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              multiple
+              hidden
+            />
+        </div>
+      </section>
+
+      <section class="sequence-panel" aria-labelledby="sequence-title">
+        <div class="section-heading section-heading--row">
+          <div>
+            <p class="eyebrow">02 / SEQUENCE</p>
+            <h2 id="sequence-title">IMAGE SEQUENCE</h2>
+          </div>
+          <div class="toolbar">
+            <button
+              class="button button--quiet"
+              id="reset-button"
+              type="button"
+              disabled
+            >
+              重置顺序
+            </button>
+            <button
+              class="button button--danger"
+              id="clear-button"
+              type="button"
+              disabled
+            >
+              清空
+            </button>
+          </div>
+        </div>
+
+        <ol
+          class="sequence-list"
+          id="sequence-list"
+          aria-label="图片帧顺序"
+        ></ol>
+        <p class="empty-state" id="empty-state">
+          <span class="empty-state__mark" aria-hidden="true"></span>
+          序列为空，先导入图片
+        </p>
+      </section>
+
+      <aside class="settings-panel" aria-labelledby="settings-title">
+        <div class="section-heading">
+        <p class="eyebrow">03 / OUTPUT</p>
+        <h2 id="settings-title">输出设置</h2>
+        </div>
+
+        <p class="settings-group">时间</p>
+
+        <div class="field">
+          <label for="delay-input">帧延迟</label>
+          <div class="field__control">
+            <input
+              id="delay-input"
+              type="number"
+              min="10"
+              max="5000"
+              step="10"
+              value="100"
+              inputmode="numeric"
+            />
+            <span>ms</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="loop-select">循环</label>
+          <select id="loop-select">
+            <option value="0">无限循环</option>
+          </select>
+        </div>
+
+        <p class="settings-group">画面</p>
+
+        <div class="field">
+          <label for="width-input">输出宽度</label>
+          <div class="field__control">
+            <input
+              id="width-input"
+              type="number"
+              min="16"
+              max="2000"
+              step="1"
+              value="800"
+              inputmode="numeric"
+            />
+            <span>px</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="background-input">透明区域背景</label>
+          <div class="field__control">
+            <input id="background-input" type="color" value="#ffffff" />
+            <output id="background-value" for="background-input">#ffffff</output>
+          </div>
+        </div>
+
+        <span class="settings-spacer" aria-hidden="true"></span>
+
+        <button
+          class="button button--generate"
+          id="generate-button"
+          type="button"
+          disabled
+        >
+          生成 GIF
+        </button>
+      </aside>
+
+      <section class="preview-panel" aria-labelledby="preview-title">
+        <div class="section-heading section-heading--row">
+          <div>
+            <p class="eyebrow">04 / PREVIEW</p>
+            <h2 id="preview-title">LIVE PREVIEW</h2>
+          </div>
+          <button
+            class="button button--secondary"
+            id="preview-toggle"
+            type="button"
+            disabled
+          >
+            播放预览
+          </button>
+        </div>
+
+        <div class="preview-stage">
+          <canvas
+            id="preview-canvas"
+            width="800"
+            height="450"
+            aria-label="GIF 动画预览"
+          ></canvas>
+          <p class="preview-placeholder" id="preview-placeholder">
+            导入图片后在这里预览动画
+          </p>
+        </div>
+      </section>
+
+      <footer class="status-bar">
+        <p id="status" aria-live="polite">等待导入图片</p>
+        <p id="output-size">尚未生成</p>
+      </footer>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

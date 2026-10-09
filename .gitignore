@@ -1,0 +1,23 @@
+# 依赖与构建产物
+node_modules/
+dist/
+
+# 测试产物
+test-results/
+playwright-report/
+blob-report/
+.playwright-artifacts-*/
+
+# 本地导出物（每个用户自己的 GIF 不该入库）
+导出成品/
+
+# 编辑器与系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 日志与临时文件
+*.log
+npm-debug.log*
+*.tmp.mjs

@@ -1,0 +1,932 @@
+/* ============ 自托管字体 ============
+   Space Grotesk / JetBrains Mono 都只取 latin 子集自托管：
+   - 本机并未安装这两款字体，CSS 里只写字体名会全部回退到 Consolas，
+     视觉上等于「字体没生效」（实测宽度比对：Space Grotesk 请求后仍是
+     monospace 的 200px，JetBrains Mono 同）。
+   - 只下载 latin 子集，各 20-30 KB；不含中日韩字形，中文继续走系统字体。
+   - 不走 CDN，符合 spec「不依赖第三方字体、优先本地回退」的要求。
+   - 每个家族只留一份可变字体文件（MD5 相同，字重靠 font-weight 区间生效）。 */
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/fonts/SpaceGrotesk.woff2") format("woff2");
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --ink: #171717;
+  --ink-soft: #3a3833;
+  --paper: #f3f0e8;
+  --paper-deep: #e8e3d6;
+  --develop: #d9ff45;
+  --track: #ff5a36;
+  --muted: #6f6b62;
+  --line: #c8c3b7;
+  --line-soft: #ded9cd;
+  --surface: #fffdf7;
+  --focus: #2667ff;
+
+  /* 圆角刻度：方格元素统一从这里取，避免各处随手写 */
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 18px;
+  --r-pill: 999px;
+
+  /* 统一节奏：所有间距从这一组刻度取 */
+  --gap-1: 4px;
+  --gap-2: 8px;
+  --gap-3: 14px;
+  --gap-4: 22px;
+  --gap-5: 34px;
+  --pad-section: clamp(22px, 3vw, 38px);
+
+  color-scheme: light;
+  font-family: Inter, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ============ 页头 ============ */
+
+.site-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-4);
+  min-height: 78px;
+  padding: 14px clamp(20px, 4vw, 56px) 20px;
+  color: var(--paper);
+  background: var(--ink);
+}
+
+/* 页头下缘的胶片齿孔条 */
+.site-header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -5px;
+  height: 5px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ink) 0 9px,
+    var(--paper-deep) 9px 14px
+  );
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-3);
+}
+
+/* 品牌标：两张叠放的画格。原来是「FF」文字，依赖字体渲染；
+   改成 SVG 后任何环境下形状都一致，且小尺寸下不糊。 */
+.brand-mark {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  place-items: center;
+  border-radius: var(--r-md);
+  color: var(--ink);
+  background: var(--develop);
+}
+
+.brand-mark svg {
+  display: block;
+  width: 34px;
+  height: 34px;
+}
+
+.eyebrow {
+  margin: 0 0 3px;
+  color: currentColor;
+  opacity: 0.6;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-family: "Space Grotesk", "Arial Black", sans-serif;
+  font-weight: 600;
+  /* 收紧字距：Space Grotesk 本身偏宽，不收会显得松散 */
+  letter-spacing: -0.025em;
+}
+
+h1 {
+  font-size: clamp(1.5rem, 3.4vw, 2.15rem);
+  line-height: 1.05;
+}
+
+h2 {
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  line-height: 1.15;
+}
+
+h2[lang],
+h1[lang] {
+  /* 中文标题字距不该负太多，否则笔画粘连 */
+  letter-spacing: 0.01em;
+}
+
+.privacy-note {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+  margin: 0;
+  padding: 7px 13px;
+  border: 1px solid #55534e;
+  border-radius: var(--r-pill);
+  color: #c9c4b8;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.privacy-note::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--develop);
+}
+
+/* ============ 工作区骨架 ============ */
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--gap-3);
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--gap-3) clamp(12px, 2.5vw, 28px) var(--gap-5);
+  background: var(--paper);
+  border-inline: 1px solid var(--line);
+}
+
+.import-panel,
+.sequence-panel,
+.settings-panel,
+.preview-panel {
+  min-width: 0;
+  padding: var(--pad-section);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  /* 极轻的投影，只用来把卡片从纸底上托起来 */
+  box-shadow: 0 1px 2px rgb(23 23 23 / 4%), 0 4px 14px rgb(23 23 23 / 4%);
+}
+
+.import-panel,
+.sequence-panel {
+  grid-column: 1;
+}
+
+.settings-panel {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-panel > .section-heading {
+  flex: none;
+}
+
+/* 弹性占位：把「生成 GIF」推到底部。
+   侧栏高度等于内容高度时它不产生多余空间，窄屏下由媒体查询隐藏。 */
+.settings-spacer {
+  flex: 1 1 auto;
+  min-height: var(--gap-3);
+}
+
+/* 预览区横跨全宽，但必须显式指定第 3 行——避免与跨 1-2 行的侧栏抢行。
+   内边距比其它面板小，让画布在卡片里占比更高。 */
+.preview-panel {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  padding: var(--gap-4) var(--pad-section);
+}
+
+.section-heading {
+  margin-bottom: var(--gap-4);
+}
+
+.section-heading--row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--gap-4);
+}
+
+.section-heading p:not(.eyebrow) {
+  max-width: 62ch;
+  margin: var(--gap-2) 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+/* ============ 导入区 ============ */
+
+.drop-zone {
+  display: grid;
+  min-height: 200px;
+  padding: var(--gap-4) var(--gap-3);
+  place-items: center;
+  align-content: center;
+  gap: var(--gap-2);
+  border: 2px dashed #c2bdb0;
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.drop-zone:hover {
+  border-color: var(--ink-soft);
+}
+
+.drop-zone.is-dragging {
+  border-color: var(--ink);
+  border-style: solid;
+  background: var(--develop);
+  transform: scale(1.005);
+}
+
+.drop-zone__icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--ink);
+  border-radius: var(--r-md);
+  color: var(--ink);
+  font-size: 1.4rem;
+  line-height: 1;
+  transition: background-color 160ms ease;
+}
+
+.drop-zone.is-dragging .drop-zone__icon {
+  background: var(--paper);
+}
+
+.drop-zone__title {
+  margin: var(--gap-1) 0 0;
+  font-family: "Space Grotesk", "Arial Black", sans-serif;
+  font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.drop-zone__hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.drop-zone__formats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-1);
+  justify-content: center;
+  margin: var(--gap-2) 0 0;
+}
+
+.drop-zone__formats span {
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  color: var(--muted);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+/* ============ 通用按钮 ============ */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+}
+
+.button {
+  min-height: 42px;
+  padding: 9px 16px;
+  border: 1px solid var(--ink);
+  border-radius: var(--r-md);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition: transform 150ms ease, background-color 150ms ease,
+    color 150ms ease, box-shadow 150ms ease;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgb(23 23 23 / 14%);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgb(23 23 23 / 12%);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.button--primary,
+.button--generate {
+  color: var(--paper);
+  background: var(--ink);
+}
+
+.button--primary:hover:not(:disabled),
+.button--generate:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--develop);
+  box-shadow: 0 4px 14px rgb(217 255 69 / 40%);
+}
+
+.button--secondary {
+  background: var(--develop);
+}
+
+.button--secondary:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgb(217 255 69 / 45%);
+}
+
+.button--quiet {
+  color: var(--muted);
+  border-color: var(--line);
+  background: transparent;
+}
+
+.button--quiet:hover:not(:disabled) {
+  color: var(--ink);
+  border-color: var(--ink);
+  background: transparent;
+}
+
+.button--danger {
+  color: var(--track);
+  border-color: var(--track);
+}
+
+.button--danger:hover:not(:disabled) {
+  color: var(--paper);
+  background: var(--track);
+  box-shadow: 0 4px 12px rgb(255 90 54 / 32%);
+}
+
+.button--generate {
+  width: 100%;
+  min-height: 50px;
+  margin-top: var(--gap-4);
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+}
+
+/* ============ 帧轨：序列区 ============ */
+
+.sequence-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(124px, 1fr));
+  gap: var(--gap-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sequence-list:empty {
+  display: none;
+}
+
+.frame-card-slot {
+  min-width: 0;
+}
+
+.frame-card-slot.is-drop-target {
+  outline: 3px solid var(--develop);
+  outline-offset: 3px;
+  border-radius: var(--r-lg);
+}
+
+.frame-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  cursor: grab;
+  transition: box-shadow 180ms ease, transform 180ms ease,
+    border-color 180ms ease;
+}
+
+.frame-card:hover {
+  border-color: var(--ink);
+  box-shadow: 0 6px 18px rgb(23 23 23 / 13%);
+  transform: translateY(-3px);
+}
+
+/* 当前帧用显影绿内描边——「显影」是这个项目的核心隐喻 */
+.frame-card.is-active {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 3px var(--develop), 0 6px 18px rgb(23 23 23 / 13%);
+}
+
+.frame-card.is-dragging {
+  opacity: 0.4;
+}
+
+.frame-card__media {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--line-soft);
+}
+
+.frame-card__meta {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--gap-1);
+  padding: var(--gap-2) var(--gap-1) var(--gap-1) var(--gap-2);
+  background: var(--surface);
+}
+.frame-card__index {
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+  color: var(--paper);
+  background: var(--ink);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+}
+
+.frame-card.is-active .frame-card__index {
+  color: var(--ink);
+  background: var(--develop);
+}
+
+.frame-card__name {
+  overflow: hidden;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.frame-card__remove {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.05rem;
+  line-height: 1;
+  transition: color 130ms ease, background-color 130ms ease,
+    border-color 130ms ease;
+}
+
+.frame-card__remove:hover {
+  color: var(--paper);
+  border-color: var(--track);
+  background: var(--track);
+}
+
+/* 「移动」按钮做成浮在缩略图上的半透明控件，不再割裂卡片 */
+.frame-card__move-controls {
+  position: absolute;
+  inset: auto 0 0;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.frame-card:hover .frame-card__move-controls,
+.frame-card:focus-within .frame-card__move-controls {
+  opacity: 1;
+}
+
+.frame-card__move {
+  width: 100%;
+  min-height: 30px;
+  border: 0;
+  color: var(--paper);
+  background: rgb(23 23 23 / 82%);
+  backdrop-filter: blur(2px);
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  transition: background-color 140ms ease;
+}
+
+.frame-card__move:hover {
+  color: var(--ink);
+  background: var(--develop);
+}
+
+/* 无 hover 能力的设备（触屏）直接常显，否则「移动」永远点不到 */
+@media (hover: none) {
+  .frame-card__move-controls {
+    position: static;
+    opacity: 1;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .frame-card__move {
+    color: var(--muted);
+    background: transparent;
+  }
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-3);
+  margin: 0;
+  padding: 38px 20px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-lg);
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.empty-state[hidden] {
+  display: none;
+}
+
+.empty-state__mark {
+  flex: none;
+  width: 30px;
+  height: 22px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--line) 0 4px,
+    transparent 4px 8px
+  );
+}
+
+/* ============ 设置侧栏 ============ */
+
+.settings-group {
+  margin: var(--gap-5) 0 var(--gap-1);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.settings-group:first-of-type {
+  margin-top: 0;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+  padding: var(--gap-3) 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.field:last-of-type {
+  border-bottom: 0;
+}
+
+.field label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.field__control {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.85rem;
+  transition: border-color 130ms ease, background-color 130ms ease,
+    box-shadow 130ms ease;
+}
+
+.field input:hover,
+.field select:hover {
+  border-color: var(--ink-soft);
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--ink);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgb(38 103 255 / 12%);
+}
+
+.field__control > span {
+  flex: none;
+  color: var(--muted);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.76rem;
+}
+
+.field input[type="color"] {
+  width: 46px;
+  height: 42px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.field output {
+  color: var(--ink-soft);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ============ 预览台 ============ */
+
+.preview-stage {
+  position: relative;
+  display: grid;
+  /* 放映台宽度跟随画布内容，避免固定撑满后两侧留下大片空棋盘 */
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  min-height: 200px;
+  padding: var(--gap-4);
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background:
+    linear-gradient(45deg, #e8e3d6 25%, transparent 25%),
+    linear-gradient(-45deg, #e8e3d6 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e8e3d6 75%),
+    linear-gradient(-45deg, transparent 75%, #e8e3d6 75%),
+    var(--paper);
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+  background-size: 20px 20px;
+}
+
+#preview-canvas {
+  display: block;
+  /* canvas 带 HTML width/height 属性，父容器百分比 max-height 对它无效，
+     只能用视口单位兜底。限宽 760px 让放映台不至于在大屏上显得空荡 */
+  max-width: min(100%, 880px);
+  max-height: min(40vh, 420px);
+  width: auto;
+  height: auto;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--line), 0 8px 24px rgb(23 23 23 / 12%);
+}
+
+.preview-placeholder {
+  position: absolute;
+  margin: 0;
+  padding: 9px 16px;
+  border-radius: var(--r-pill);
+  color: var(--paper);
+  background: var(--ink);
+  font-size: 0.84rem;
+}
+
+.preview-placeholder[hidden] {
+  display: none;
+}
+
+/* 空状态（占位提示可见＝画布还是默认的 800×450）时收窄放映台，
+   并隐藏那张撑尺寸的空白画布，否则会显示一个 800×450 的大空框。
+   fit-content 会让宽度塌到文字最小宽，标题被压成竖排，所以给个 min-width。 */
+.preview-stage:has(.preview-placeholder:not([hidden])) {
+  width: fit-content;
+  min-width: min(420px, 100%);
+  margin-inline: auto;
+  min-height: 0;
+  padding: var(--gap-4) var(--gap-5);
+}
+
+.preview-stage:has(.preview-placeholder:not([hidden])) #preview-canvas {
+  display: none;
+}
+
+/* ============ 状态栏 ============ */
+
+.status-bar {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gap-3);
+  margin-top: var(--gap-3);
+  padding: 13px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: #a8a396;
+  background: var(--ink);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.02em;
+}
+
+.status-bar p {
+  margin: 0;
+}
+
+.status-bar p:first-child {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+  color: var(--paper);
+  font-weight: 500;
+}
+
+.status-bar p:first-child::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--develop);
+}
+
+.status-bar.is-error p:first-child::before {
+  background: var(--track);
+}
+
+.status-bar p:last-child {
+  color: #837e73;
+  text-align: right;
+}
+
+/* ============ 响应式 ============ */
+
+@media (max-width: 1020px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .site-header,
+  .section-heading--row,
+  .status-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workspace {
+    display: block;
+    border-inline: 0;
+    padding-inline: var(--gap-3);
+  }
+
+  /* 卡片式布局下，改用间距分隔而不是边框 */
+  .import-panel,
+  .sequence-panel,
+  .settings-panel,
+  .preview-panel,
+  .status-bar {
+    margin-bottom: var(--gap-3);
+    padding: var(--gap-4) var(--gap-3);
+  }
+
+  .settings-panel {
+    position: static;
+    max-height: none;
+  }
+
+  .settings-spacer {
+    display: none;
+  }
+
+  .status-bar {
+    gap: var(--gap-1);
+  }
+
+  /* 触控目标不小于 44px */
+  .button,
+  .frame-card__remove,
+  .frame-card__move {
+    min-height: 44px;
+  }
+
+  .frame-card__remove {
+    width: 44px;
+    height: 44px;
+  }
+
+  .toolbar .button {
+    flex: 1;
+  }
+
+  .sequence-list {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  }
+
+  .preview-stage {
+    padding: var(--gap-3);
+  }
+}
+
+@media (max-width: 420px) {
+  .sequence-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ============ 动效降级 ============ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
