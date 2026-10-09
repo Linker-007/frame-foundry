@@ -1,5 +1,8 @@
 # Frame Foundry
 
+[![Release](https://img.shields.io/github/release/Linker-007/frame-foundry.svg)](https://github.com/Linker-007/frame-foundry/releases)
+[![License](https://img.shields.io/github/license/Linker-007/frame-foundry.svg)](LICENSE)
+
 > 把多张图片整理成序列，导出为 GIF。**全程在浏览器本地完成，图片不上传任何服务器。**
 
 一个纯前端的图片序列编辑与 GIF 导出工具。拖入图片 → 调整帧序 → 设置帧延迟、循环、输出宽度与背景色 → 实时预览 → 导出 GIF。
