@@ -21,3 +21,4 @@ Thumbs.db
 *.log
 npm-debug.log*
 *.tmp.mjs
+shot-final.mjs

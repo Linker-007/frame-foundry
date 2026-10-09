@@ -223,9 +223,15 @@ h1[lang] {
   grid-column: 1;
 }
 
+/* 侧栏跨导入 + 序列两行。
+   align-self: start 防止它被 grid 拉伸到与左侧等高——一旦被拉高，
+   推杆就会撑出大片空白，「生成 GIF」与设置项之间会隔开很远。
+   不加 position: sticky：sticky 侧栏滚动后会浮到下方区块之上，
+   实测其 label 会盖住预览区右上角的「播放预览」按钮，导致 e2e 点击超时。 */
 .settings-panel {
   grid-row: 1 / span 2;
   grid-column: 2;
+  align-self: start;
   display: flex;
   flex-direction: column;
 }
@@ -234,11 +240,11 @@ h1[lang] {
   flex: none;
 }
 
-/* 弹性占位：把「生成 GIF」推到底部。
-   侧栏高度等于内容高度时它不产生多余空间，窄屏下由媒体查询隐藏。 */
+/* 侧栏高度由 grid 拉伸到与左侧两区等高，推杆把「生成 GIF」压到底部。
+   推杆本身不产生高度，只是把按钮推下去。 */
 .settings-spacer {
   flex: 1 1 auto;
-  min-height: var(--gap-3);
+  min-height: 0;
 }
 
 /* 预览区横跨全宽，但必须显式指定第 3 行——避免与跨 1-2 行的侧栏抢行。

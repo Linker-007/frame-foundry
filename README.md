@@ -6,6 +6,21 @@
 
 运行时依赖只有 [`gifenc`](https://github.com/mattdesl/gifenc) 一个，没有前端框架。
 
+![界面预览](screenshots/ui-filled.png)
+
+<details>
+<summary>其它截图</summary>
+
+空状态：
+
+![空状态](screenshots/ui-empty.png)
+
+移动端（390px）：
+
+![移动端](screenshots/ui-mobile.png)
+
+</details>
+
 ---
 
 ## 特性
